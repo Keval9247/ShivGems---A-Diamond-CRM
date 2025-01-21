@@ -2,11 +2,11 @@ import connectMongoDB from "@/dbconfig/db";
 import userModel from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 
-connectMongoDB();
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const role = searchParams.get("role");
+    await connectMongoDB();
 
     try {
         if (!role) {
