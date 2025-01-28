@@ -1,10 +1,13 @@
 import MasterBox from '@/components/dashboard/MasterBox'
-import React from 'react'
+import Loading from '@/utils/Loading'
+import React, { Suspense } from 'react'
 
 function DashboardMainPage() {
     return (
         <>
-            <MasterBox />
+            <Suspense fallback={<Loading global={true} isLoading={true} />}>
+                <MasterBox />
+            </Suspense>
         </>
     )
 }
