@@ -29,6 +29,14 @@ const CustomTable: React.FC<CustomTableProps> = ({ headers, rows, actions, rende
         borderBottom: "1px solid #e5e7eb",
     };
 
+    const actionCellStyle: React.CSSProperties = {
+        ...cellStyle,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "8px", // Space between buttons
+    };
+
     return (
         <>
             <div className="bg-white p-5 rounded-lg">
@@ -71,16 +79,6 @@ const CustomTable: React.FC<CustomTableProps> = ({ headers, rows, actions, rende
                             Reset
                         </button>
                     </div>
-
-                    {/* Right Section */}
-                    <div className="flex gap-3 flex-wrap">
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
-                            Add {field}
-                        </button>
-                        <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
-                            Export
-                        </button>
-                    </div>
                 </div>
 
                 <div style={{ overflowX: "auto", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", borderTop: '1px solid #eeeeee' }}>
@@ -114,7 +112,11 @@ const CustomTable: React.FC<CustomTableProps> = ({ headers, rows, actions, rende
                                             {renderCell ? renderCell(header, row[header]) : row[header]}
                                         </td>
                                     ))}
-                                    {actions && <td style={cellStyle}>{actions(row)}</td>}
+                                    {actions &&
+                                        <div>
+                                            <td style={actionCellStyle}>{actions(row)}</td>
+                                        </div>
+                                    }
                                 </tr>
                             ))}
                         </tbody>

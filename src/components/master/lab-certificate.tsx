@@ -1,5 +1,8 @@
+import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
 import React from 'react'
+import { BiEdit } from 'react-icons/bi';
+import { MdDelete } from 'react-icons/md';
 
 function LabcertificateComponent() {
     const headers = ["Lab Cert Name", "Lab Cert Code", "Order", "Status"];
@@ -10,20 +13,39 @@ function LabcertificateComponent() {
         { "Lab Cert Name": "IGI", "Lab Cert Code": "1 IGI", "Order": 1, "Status": "Active" },
     ];
 
+    const field = "lab-certi."
+
     const actions = (row: any) => (
-        <button
-            onClick={() => console.log("Edit:", row)}
-            className="text-blue-600 hover:text-blue-900"
-        >
-            Edit
-        </button>
+        <div className="flex justify-center items-center space-x-5">
+            <button
+                onClick={() => console.log("Edit:", row)}
+                className="text-blue-600 hover:text-blue-900"
+            >
+                <BiEdit className='w-5 h-5' />
+            </button>
+            <button
+                onClick={() => console.log("Delete:", row)}
+                className="text-red-600 hover:text-red-900"
+            >
+                <MdDelete className='w-5 h-5' />
+            </button>
+        </div>
     );
 
     return (
-        <div className="w-full">
-            <CustomTable headers={headers} rows={rows} actions={actions} field='lab-certi.' />
+        <>
+            <div className="w-full">
+                <div className='flex justify-end mb-3'>
+                    <Modal field={field} />
+                </div>
 
-        </div>
+                <CustomTable
+                    headers={headers}
+                    rows={rows}
+                    actions={actions}
+                />
+            </div>
+        </>
     );
 }
 
