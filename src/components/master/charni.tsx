@@ -1,6 +1,9 @@
+import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
 import Loading from '@/utils/Loading';
 import React, { useEffect, useState } from 'react'
+import { BiEdit } from 'react-icons/bi';
+import { MdDelete } from 'react-icons/md';
 
 function CharniComponent() {
     const [isLoading, setIsLoading] = useState(true);
@@ -27,28 +30,39 @@ function CharniComponent() {
         { "Charni Name": "0.08-0.13", "Charni Code": "0.08-0.13", "From (Ct)": "0.0800", "To (Ct)": "0.1399", "Order": 2, "Status": "Active" },
     ];
 
-    const actions = (row: any) => (
-        <button
-            onClick={() => console.log("Edit:", row)}
-            className="text-blue-600 hover:text-blue-900"
-        >
-            Edit
-        </button>
-    );
-
     const field = "charni"
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 2000);
-    }, []);
+    const actions = (row: any) => (
+        <div className="flex justify-center items-center space-x-5">
+            <button
+                onClick={() => console.log("Edit:", row)}
+                className="text-blue-600 hover:text-blue-900"
+            >
+                <BiEdit className='w-5 h-5' />
+            </button>
+            <button
+                onClick={() => console.log("Delete:", row)}
+                className="text-red-600 hover:text-red-900"
+            >
+                <MdDelete className='w-5 h-5' />
+            </button>
+        </div>
+    );
 
     return (
-        <div className="w-full relative">
-            <Loading isLoading={isLoading} />
-            <CustomTable headers={headers} rows={rows} actions={actions} field={field} />
-        </div>
+        <>
+            <div className="w-full">
+                <div className='flex justify-end mb-3'>
+                    <Modal field={field} />
+                </div>
+
+                <CustomTable
+                    headers={headers}
+                    rows={rows}
+                    actions={actions}
+                />
+            </div>
+        </>
     );
 }
 

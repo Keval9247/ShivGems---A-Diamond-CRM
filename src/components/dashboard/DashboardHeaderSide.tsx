@@ -97,10 +97,10 @@ const DashboardHeaderSideBar: React.FC<{ children: React.ReactNode }> = ({ child
                         <div className="flex items-center gap-4">
                             <div className="hidden sm:flex flex-col items-end">
                                 <p className="font-bold text-sm lg:text-base truncate max-w-[160px]">
-                                    {admin?.username || "Admin"}
+                                    {admin?.username ? admin?.username[0].toUpperCase() + admin?.username.slice(1) : "Admin"}
                                 </p>
                                 <p className="text-gray-600 text-xs lg:text-sm truncate max-w-[160px]">
-                                    {admin?.email}
+                                    {admin?.email || null}
                                 </p>
                             </div>
 
