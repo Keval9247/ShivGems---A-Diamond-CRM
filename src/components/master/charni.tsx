@@ -1,36 +1,68 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
 import Loading from '@/utils/Loading';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function CharniComponent() {
-    const [isLoading, setIsLoading] = useState(true);
     const headers = ["Charni Name", "Charni Code", "From (Ct)", "To (Ct)", "Order", "Status"];
+    const [isLoading, setIsLoading] = useState(true);
+    const tableName = "charni"
 
-    const rows = [
-        { "Charni Name": "0.90-0.97", "Charni Code": "0.9-0.97", "From (Ct)": "0.9000", "To (Ct)": "0.9799", "Order": 10, "Status": "Active" },
-        { "Charni Name": "5 Ct UP", "Charni Code": "5 Ct UP", "From (Ct)": "5.0000", "To (Ct)": "100.0000", "Order": 18, "Status": "Active" },
-        { "Charni Name": "4.00-4.99", "Charni Code": "4.00-4.99", "From (Ct)": "4.0000", "To (Ct)": "4.9999", "Order": 17, "Status": "Active" },
-        { "Charni Name": "3.00-3.99", "Charni Code": "3.00-3.99", "From (Ct)": "3.0000", "To (Ct)": "3.9999", "Order": 16, "Status": "Active" },
-        { "Charni Name": "2.50-2.99", "Charni Code": "2.50-2.99", "From (Ct)": "2.5000", "To (Ct)": "2.9999", "Order": 15, "Status": "Active" },
-        { "Charni Name": "2.00-2.49", "Charni Code": "2.00-2.49", "From (Ct)": "2.0000", "To (Ct)": "2.4999", "Order": 14, "Status": "Active" },
-        { "Charni Name": "1.50-1.99", "Charni Code": "1.50-1.99", "From (Ct)": "1.5000", "To (Ct)": "1.9999", "Order": 13, "Status": "Active" },
-        { "Charni Name": "1.20-1.49", "Charni Code": "1.20-1.49", "From (Ct)": "1.2000", "To (Ct)": "1.4999", "Order": 12, "Status": "Active" },
-        { "Charni Name": "0.98-1.19", "Charni Code": "0.98-1.19", "From (Ct)": "0.9800", "To (Ct)": "1.1999", "Order": 11, "Status": "Active" },
-        { "Charni Name": "0.01-0.07", "Charni Code": "0.01-0.07", "From (Ct)": "0.0100", "To (Ct)": "0.0799", "Order": 1, "Status": "Active" },
-        { "Charni Name": "0.70-0.89", "Charni Code": "0.70-0.89", "From (Ct)": "0.7000", "To (Ct)": "0.8999", "Order": 9, "Status": "Active" },
-        { "Charni Name": "0.60-0.69", "Charni Code": "0.60-0.69", "From (Ct)": "0.6000", "To (Ct)": "0.6999", "Order": 8, "Status": "Active" },
-        { "Charni Name": "0.50-0.59", "Charni Code": "0.50-0.59", "From (Ct)": "0.5000", "To (Ct)": "0.5999", "Order": 7, "Status": "Active" },
-        { "Charni Name": "0.30-0.49", "Charni Code": "0.30-0.49", "From (Ct)": "0.3000", "To (Ct)": "0.4999", "Order": 6, "Status": "Active" },
-        { "Charni Name": "0.23-0.29", "Charni Code": "0.23-0.29", "From (Ct)": "0.2300", "To (Ct)": "0.2999", "Order": 5, "Status": "Active" },
-        { "Charni Name": "0.18-0.22", "Charni Code": "0.18-0.22", "From (Ct)": "0.1800", "To (Ct)": "0.2299", "Order": 4, "Status": "Active" },
-        { "Charni Name": "0.14-0.17", "Charni Code": "0.14-0.17", "From (Ct)": "0.1400", "To (Ct)": "0.1799", "Order": 3, "Status": "Active" },
-        { "Charni Name": "0.08-0.13", "Charni Code": "0.08-0.13", "From (Ct)": "0.0800", "To (Ct)": "0.1399", "Order": 2, "Status": "Active" },
-    ];
 
-    const field = "charni"
+    // const rows = [
+    //     { name: "0.90-0.97", code: "0.9-0.97", from: "0.9000", to: "0.9799", order: 10, status: "Active" },
+    //     { name: "5 Ct UP", code: "5 Ct UP", from: "5.0000", to: "100.0000", order: 18, status: "Active" },
+    //     { name: "4.00-4.99", code: "4.00-4.99", from: "4.0000", to: "4.9999", order: 17, status: "Active" },
+    //     { name: "3.00-3.99", code: "3.00-3.99", from: "3.0000", to: "3.9999", order: 16, status: "Active" },
+    //     { name: "2.50-2.99", code: "2.50-2.99", from: "2.5000", to: "2.9999", order: 15, status: "Active" },
+    //     { name: "2.00-2.49", code: "2.00-2.49", from: "2.0000", to: "2.4999", order: 14, status: "Active" },
+    //     { name: "1.50-1.99", code: "1.50-1.99", from: "1.5000", to: "1.9999", order: 13, status: "Active" },
+    //     { name: "1.20-1.49", code: "1.20-1.49", from: "1.2000", to: "1.4999", order: 12, status: "Active" },
+    //     { name: "0.98-1.19", code: "0.98-1.19", from: "0.9800", to: "1.1999", order: 11, status: "Active" },
+    //     { name: "0.01-0.07", code: "0.01-0.07", from: "0.0100", to: "0.0799", order: 1, status: "Active" },
+    //     { name: "0.70-0.89", code: "0.70-0.89", from: "0.7000", to: "0.8999", order: 9, status: "Active" },
+    //     { name: "0.60-0.69", code: "0.60-0.69", from: "0.6000", to: "0.6999", order: 8, status: "Active" },
+    //     { name: "0.50-0.59", code: "0.50-0.59", from: "0.5000", to: "0.5999", order: 7, status: "Active" },
+    //     { name: "0.30-0.49", code: "0.30-0.49", from: "0.3000", to: "0.4999", order: 6, status: "Active" },
+    //     { name: "0.23-0.29", code: "0.23-0.29", from: "0.2300", to: "0.2999", order: 5, status: "Active" },
+    //     { name: "0.18-0.22", code: "0.18-0.22", from: "0.1800", to: "0.2299", order: 4, status: "Active" },
+    //     { name: "0.14-0.17", code: "0.14-0.17", from: "0.1400", to: "0.1799", order: 3, status: "Active" },
+    //     { name: "0.08-0.13", code: "0.08-0.13", from: "0.0800", to: "0.1399", order: 2, status: "Active" },
+    // ];
+    const [data, setData] = useState([]);
+    const [rows, setRows] = useState<ColorRow[]>([]);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+            const apiData = response.data.data;
+
+            if (apiData.length > 0) {
+                const mappedData = apiData.map((item: any) => ({
+                    "Charni Name": item.name,
+                    "Charni Code": item.code,
+                    "From (Ct)": item.from,
+                    "To (Ct)": item.to,
+                    "Order": item.order,
+                    "Status": item.status,
+                }));
+
+                setRows(mappedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const actions = (row: any) => (
         <div className="flex justify-center items-center space-x-5">
@@ -53,14 +85,14 @@ function CharniComponent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={field} />
+                    <Modal tableName={tableName} fetchData={fetchData} />
                 </div>
 
-                <CustomTable
-                    headers={headers}
-                    rows={rows}
-                    actions={actions}
-                />
+                {isLoading ? (
+                    <Loading global={true} isLoading={isLoading} />
+                ) : (
+                    <CustomTable headers={headers} rows={rows} actions={actions} />
+                )}
             </div>
         </>
     );

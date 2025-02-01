@@ -1,31 +1,63 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
-import React from 'react'
+import Loading from '@/utils/Loading';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function PurityComponent() {
 
-  const headers = ["Purity Name", "Purity Code", "Order", "Status"];
+    const headers = ["Purity Name", "Purity Code", "Order", "Status"];
+    const [isLoading, setIsLoading] = useState(true);
+    const tableName = "purity";
 
-  const rows = [
-    { "Purity Name": "SIG", "Purity Code": "SIG", "Order": 9, "Status": "Active" },
-    { "Purity Name": "14", "Purity Code": "14", "Order": 13, "Status": "Active" },
-    { "Purity Name": "15", "Purity Code": "15", "Order": 14, "Status": "Active" },
-    { "Purity Name": "16", "Purity Code": "16", "Order": 15, "Status": "Active" },
-    { "Purity Name": "13", "Purity Code": "13", "Order": 12, "Status": "Active" },
-    { "Purity Name": "12", "Purity Code": "12", "Order": 11, "Status": "Active" },
-    { "Purity Name": "11", "Purity Code": "11", "Order": 10, "Status": "Active" },
-    { "Purity Name": "SIZ", "Purity Code": "SIZ", "Order": 8, "Status": "Active" },
-    { "Purity Name": "SIT", "Purity Code": "SIT", "Order": 7, "Status": "Active" },
-    { "Purity Name": "VSZ", "Purity Code": "VSZ", "Order": 6, "Status": "Active" },
-    { "Purity Name": "VST", "Purity Code": "VST", "Order": 5, "Status": "Active" },
-    { "Purity Name": "VVSZ", "Purity Code": "VVSZ", "Order": 4, "Status": "Active" },
-    { "Purity Name": "VVST", "Purity Code": "VVST", "Order": 2, "Status": "Active" },
-    { "Purity Name": "FF", "Purity Code": "FF", "Order": 1, "Status": "Active" },
-    { "Purity Name": "FL", "Purity Code": "FL", "Order": 0, "Status": "Active" },
-  ];
-  const field = "purity"
+    // const rows = [
+    //     { name: "SIG", code: "SIG", order: 9, status: "Active" },
+    //     { name: "14", code: "14", order: 13, status: "Active" },
+    //     { name: "15", code: "15", order: 14, status: "Active" },
+    //     { name: "16", code: "16", order: 15, status: "Active" },
+    //     { name: "13", code: "13", order: 12, status: "Active" },
+    //     { name: "12", code: "12", order: 11, status: "Active" },
+    //     { name: "11", code: "11", order: 10, status: "Active" },
+    //     { name: "SIZ", code: "SIZ", order: 8, status: "Active" },
+    //     { name: "SIT", code: "SIT", order: 7, status: "Active" },
+    //     { name: "VSZ", code: "VSZ", order: 6, status: "Active" },
+    //     { name: "VST", code: "VST", order: 5, status: "Active" },
+    //     { name: "VVSZ", code: "VVSZ", order: 4, status: "Active" },
+    //     { name: "VVST", code: "VVST", order: 2, status: "Active" },
+    //     { name: "FF", code: "FF", order: 1, status: "Active" },
+    //     { name: "FL", code: "FL", order: 0, status: "Active" },
+    // ];
+
+    const [rows, setRows] = useState<ColorRow[]>([]);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+            const apiData = response.data.data;
+
+            if (apiData.length > 0) {
+                const mappedData = apiData.map((item: any) => ({
+                    "Purity Name": item.name,
+                    "Purity Code": item.code,
+                    "Order": item.order,
+                    "Status": item.status,
+                }));
+
+                setRows(mappedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const actions = (row: any) => (
         <div className="flex justify-center items-center space-x-5">
@@ -48,14 +80,14 @@ function PurityComponent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={field} />
+                    <Modal tableName={tableName} fetchData={fetchData} />
                 </div>
 
-                <CustomTable
-                    headers={headers}
-                    rows={rows}
-                    actions={actions}
-                />
+                {isLoading ? (
+                    <Loading global={true} isLoading={isLoading} />
+                ) : (
+                    <CustomTable headers={headers} rows={rows} actions={actions} />
+                )}
             </div>
         </>
     );

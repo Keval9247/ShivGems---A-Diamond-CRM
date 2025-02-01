@@ -1,19 +1,50 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
-import React from 'react'
+import Loading from '@/utils/Loading';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function LabcertificateComponent() {
     const headers = ["Lab Cert Name", "Lab Cert Code", "Order", "Status"];
+    const [isLoading, setIsLoading] = useState(true);
+    const tableName = "labcerti";
 
-    const rows = [
-        { "Lab Cert Name": "GKL", "Lab Cert Code": "3 GKL", "Order": 3, "Status": "Active" },
-        { "Lab Cert Name": "GIA", "Lab Cert Code": "2 GIA", "Order": 2, "Status": "Active" },
-        { "Lab Cert Name": "IGI", "Lab Cert Code": "1 IGI", "Order": 1, "Status": "Active" },
-    ];
+    // const rows = [
+    //     { name: "GKL", code: "3 GKL", order: 3, status: "Active" },
+    //     { name: "GIA", code: "2 GIA", order: 2, status: "Active" },
+    //     { name: "IGI", code: "1 IGI", order: 1, status: "Active" },
+    // ];
 
-    const field = "lab-certi."
+    const [rows, setRows] = useState<ColorRow[]>([]);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+            const apiData = response.data.data;
+
+            if (apiData.length > 0) {
+                const mappedData = apiData.map((item: any) => ({
+                    "Lab Cert Name": item.name,
+                    "Lab Cert Code": item.code,
+                    "Order": item.order,
+                    "Status": item.status,
+                }));
+
+                setRows(mappedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const actions = (row: any) => (
         <div className="flex justify-center items-center space-x-5">
@@ -36,14 +67,14 @@ function LabcertificateComponent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={field} />
+                    <Modal tableName={tableName} fetchData={fetchData} />
                 </div>
 
-                <CustomTable
-                    headers={headers}
-                    rows={rows}
-                    actions={actions}
-                />
+                {isLoading ? (
+                    <Loading global={true} isLoading={isLoading} />
+                ) : (
+                    <CustomTable headers={headers} rows={rows} actions={actions} />
+                )}
             </div>
         </>
     );

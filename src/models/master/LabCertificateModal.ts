@@ -8,4 +8,4 @@ const labSchema = new mongoose.Schema({
 }, { timestamps: true, }
 );
 
-export default mongoose.models.LabCertificate || mongoose.model("LabCertificate", labSchema);
+export default mongoose.models.Labcerti || mongoose.model("Labcerti", labSchema);
