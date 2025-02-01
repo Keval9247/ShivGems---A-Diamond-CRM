@@ -31,6 +31,7 @@ function SymmetryComponent() {
 
       if (apiData.length > 0) {
         const mappedData = apiData.map((item: any) => ({
+          _id: item._id,
           "Symmetry Name": item.name,
           "Symmetry Code": item.code,
           "Order": item.order,

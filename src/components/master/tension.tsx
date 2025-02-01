@@ -31,6 +31,7 @@ function TensionCompoenent() {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Tension Name": item.name,
                     "Tension Code": item.code,
                     "Order": item.order,

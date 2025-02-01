@@ -28,6 +28,7 @@ function StoneCompoenent() {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Stone Name": item.name,
                     "Stone Code": item.code,
                     "Order": item.order,
