@@ -45,6 +45,7 @@ function RatioComponent() {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Ratio Name": item.name,
                     "Ratio Code": item.code,
                     "Order": item.order,

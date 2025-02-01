@@ -73,6 +73,7 @@ function ShapeComponent() {
 
       if (apiData.length > 0) {
         const mappedData = apiData.map((item: any) => ({
+          _id: item._id,
           "Shape Name": item.name,
           "Shape Code": item.code,
           "Advisory Shape": item.advisoryShape,

@@ -22,6 +22,7 @@ const ColorComponent: React.FC = () => {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Color Name": item.name,
                     "Color Code": item.code,
                     "Order": item.order,
@@ -29,6 +30,7 @@ const ColorComponent: React.FC = () => {
                 }));
 
                 setRows(mappedData);
+                console.log("🚀🚀 Your selected text is => mappedData: ", mappedData);
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -42,6 +44,7 @@ const ColorComponent: React.FC = () => {
     }, []);
 
     const deleteRow = async (row: ColorRow[] | any) => {
+        console.log("🚀🚀 Your selected text is => row: ", row);
         const response = await axios.delete(`/api/users/data-modification?tableName=${tableName}&itemId=${row?._id}`);
         toast.success(response?.data?.message);
         fetchData();

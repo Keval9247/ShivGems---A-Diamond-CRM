@@ -46,6 +46,7 @@ function HeightComponent() {
 
       if (apiData.length > 0) {
         const mappedData = apiData.map((item: any) => ({
+          _id: item._id,
           "Height Name": item.name,
           "Height Code": item.code,
           "Order": item.order,
