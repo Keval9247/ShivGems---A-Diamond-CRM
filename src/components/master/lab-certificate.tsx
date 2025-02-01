@@ -28,6 +28,7 @@ function LabcertificateComponent() {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Lab Cert Name": item.name,
                     "Lab Cert Code": item.code,
                     "Order": item.order,

@@ -46,6 +46,7 @@ function TableComponent() {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Table Name": item.name,
                     "Table Code": item.code,
                     "Order": item.order,

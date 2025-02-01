@@ -43,6 +43,7 @@ function CharniComponent() {
 
             if (apiData.length > 0) {
                 const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
                     "Charni Name": item.name,
                     "Charni Code": item.code,
                     "From (Ct)": item.from,

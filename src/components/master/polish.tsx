@@ -24,6 +24,7 @@ function PolishComponent() {
 
       if (apiData.length > 0) {
         const mappedData = apiData.map((item: any) => ({
+          _id: item._id,
           "Polish Name": item.name,
           "Polish Code": item.code,
           "Order": item.order,
