@@ -43,13 +43,6 @@ const Login = () => {
             } else {
                 toast.error(response?.data?.message || 'Login failed');
                 setLoading(false);
-
-                // If remember me is checked, set the cookie with expiration date
-                if (formData.rememberMe) {
-                    const expires = new Date();
-                    expires.setHours(expires.getMonth() + 1); // Expires in 24 hours
-                    document.cookie = `token=${response?.data?.token}; expires=${expires.toUTCString()}; path=/`;
-                }
             }
         } catch (error) {
             console.error('Signup error:', error);
@@ -61,7 +54,6 @@ const Login = () => {
 
     return (
         <div className="min-h-screen flex">
-            {/* Left side with illustration and content */}
             <div className="w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col items-center justify-center p-12 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-full h-full">
                     <svg
@@ -108,7 +100,6 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* Right side with login form */}
             <div className="w-1/2 bg-white flex items-center justify-center p-12">
                 <div className="max-w-md w-full space-y-8">
                     <div className="text-center">

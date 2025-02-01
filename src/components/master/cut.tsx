@@ -54,13 +54,8 @@ function CutCompoenent() {
         fetchData();
     }, []);
 
-    // const editRow = async (row: ColorRow[]) => {
-    //     const response = await axios.put(`/api/users/data-modification?tableName=${tableName}`,{tableName,ro});
-    // };
-
     const deleteRow = async (row: ColorRow[] | any) => {
         const response = await axios.delete(`/api/users/data-modification?tableName=${tableName}&itemId=${row?._id}`);
-        console.log("🚀🚀 Your selected text is => response: ", response);
         toast.success(response?.data?.message);
         fetchData();
     };
@@ -86,7 +81,7 @@ function CutCompoenent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal tableName={tableName} fetchData={fetchData} />
+                    <Modal tableName={tableName} fetchData={fetchData} headers={headers} rows={rows} />
                 </div>
 
                 {isLoading ? (
