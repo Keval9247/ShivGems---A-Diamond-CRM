@@ -6,7 +6,7 @@ import { SignJWT } from "jose";
 
 export async function POST(request: NextRequest) {
     const body = await request.json();
-    const { email, password } = body;
+    const { email, password, rememberMe } = body;
 
     if (!email || !password) {
         return NextResponse.json({
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         const token = await new SignJWT(tokenData)
             .setProtectedHeader({ alg: 'HS256' })
             .setIssuedAt()
-            .setExpirationTime('1d')
+            .setExpirationTime(rememberMe ? '7d' : '1d')
             .sign(secret);
 
         const response = NextResponse.json({
@@ -49,11 +49,11 @@ export async function POST(request: NextRequest) {
             role: user.role,
         });
 
-        // Set the token in an HTTP-only cookie
         response.cookies.set("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             path: '/',
+            maxAge: rememberMe ? 7 * 24 * 60 * 60 : 24 * 60 * 60,
         });
 
         return response;

@@ -42,7 +42,7 @@ const Signup = () => {
             const response = await axios.post('/api/auth/signup', formData);
             if (response?.data?.success) {
                 toast.success('Account created successfully');
-                router.push('/auth/login'); // Redirect to login page
+                router.push('/auth/login');
             } else {
                 toast.error(response?.data?.message || 'Signup failed');
             }
@@ -56,7 +56,6 @@ const Signup = () => {
 
     return (
         <div className="min-h-screen flex">
-            {/* Left side with illustration and content */}
             <div className="w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 flex flex-col items-center justify-center p-12 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-full h-full">
                     <svg
@@ -103,7 +102,6 @@ const Signup = () => {
                 </div>
             </div>
 
-            {/* Right side with signup form */}
             <div className="w-1/2 bg-white flex items-center justify-center p-12">
                 <div className="max-w-md w-full space-y-8">
                     <div className="text-center">

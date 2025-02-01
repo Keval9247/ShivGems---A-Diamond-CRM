@@ -1,20 +1,24 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { FiFileText } from 'react-icons/fi';
+import { FiFileText, FiPlusCircle } from 'react-icons/fi';
 import Loading from '../Loading';
 
 interface Props {
     tableName?: string;
     fetchData: () => void;
+    headers: string[];
+    rows?: Array<{ [key: string]: any }>;
 }
 
-const Modal: React.FC<Props> = ({ tableName, fetchData }) => {
+const Modal: React.FC<Props> = ({ tableName, fetchData, rows, headers }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isExportOpen, setIsExportOpen] = useState(false);
     const [name, setName] = useState('');
     const [code, setCode] = useState('');
     const [order, setOrder] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -40,6 +44,33 @@ const Modal: React.FC<Props> = ({ tableName, fetchData }) => {
         }
     };
 
+    const handleExport = async () => {
+        setIsLoading(true);
+        try {
+            const exportResponse = await axios.post(
+                "/api/users/data-modification/export",
+                { rows, headers },
+                { responseType: 'blob' }
+            );
+
+            // Create a download link and trigger the download
+            const url = window.URL.createObjectURL(new Blob([exportResponse.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${tableName}-export.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+
+            toast.success('Export successful!');
+        } catch (error: any) {
+            console.error('Error exporting CSV:', error.response?.data || error.message);
+            toast.error('Error exporting CSV!');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <div className='flex flex-row justify-center gap-5'>
             {isLoading && <Loading isLoading={isLoading} />}
@@ -51,71 +82,112 @@ const Modal: React.FC<Props> = ({ tableName, fetchData }) => {
             </button>
 
             <button
-                onClick={() => setIsOpen(false)}
+                onClick={() => setIsExportOpen(true)}
                 className="flex items-center border-2 gap-2 border-gray-300 px-4 py-2 rounded text-gray-700 hover:bg-gray-200"
             >
                 <FiFileText /> Export
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                        <h2 className="text-xl font-bold mb-4">Add {tableName}</h2>
+                        <div className="flex items-center justify-center mb-2">
+                            <div className="bg-blue-100 p-3 rounded-full">
+                                <FiPlusCircle className="text-blue-500 text-2xl" />
+                            </div>
+                        </div>
+                        <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
+                            Add {tableName}
+                        </h2>
+
                         <form onSubmit={handleSubmit}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">{tableName} Name</label>
+                            <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">{tableName} Name</label>
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                     required
-                                    placeholder={`${tableName} Name`}
+                                    placeholder={`Enter ${tableName} Name`}
                                 />
                             </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Code</label>
+                            <div className="mb-3">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Code</label>
                                 <input
                                     type="text"
                                     value={code}
                                     onChange={(e) => setCode(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                     required
-                                    placeholder="Code"
+                                    placeholder="Enter Code"
                                 />
                             </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">Order</label>
+                            <div className="mb-8">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Order</label>
                                 <input
                                     type="number"
                                     value={order}
                                     onChange={(e) => setOrder(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                                     required
+                                    placeholder="Enter Order"
                                 />
                             </div>
-
-                            <div className="flex justify-end">
+                            <div className="flex justify-end gap-4">
                                 <button
                                     type="button"
                                     onClick={() => setIsOpen(false)}
-                                    className="mr-2 bg-gray-500 text-white px-4 py-2 rounded"
+                                    className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-all duration-200"
                                     disabled={isLoading}
                                 >
                                     Cancel
                                 </button>
-
                                 <button
                                     type="submit"
-                                    className={`px-4 py-2 rounded text-white ${isLoading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"}`}
+                                    className={`px-6 py-2 rounded-lg text-white transition-all duration-200 ${isLoading
+                                        ? "bg-gray-400 cursor-not-allowed"
+                                        : "bg-blue-500 hover:bg-blue-600"
+                                        }`}
                                     disabled={isLoading}
                                 >
                                     {isLoading ? "Saving..." : "Submit"}
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {isExportOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-96 transform transition-all duration-300 ease-in-out scale-100 animate-fade-in">
+                        <div className="flex items-center justify-center mb-4">
+                            <div className="bg-blue-100 p-3 rounded-full">
+                                <FiFileText className="text-blue-500 text-2xl" />
+                            </div>
+                        </div>
+                        <h2 className="text-xl font-bold text-center mb-2">Confirm Export</h2>
+                        <p className="text-sm text-gray-600 text-center mb-6">
+                            Are you sure you want to export the data to Excel?
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsExportOpen(false)}
+                                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsExportOpen(false);
+                                    handleExport();
+                                }}
+                                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200"
+                            >
+                                Export
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

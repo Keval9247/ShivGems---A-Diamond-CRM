@@ -1,8 +1,10 @@
+import { ColorRow } from "@/types/rowTypes";
 import Modal from "@/utils/common-modal/modal";
 import CustomTable from "@/utils/CustomTable";
 import Loading from "@/utils/Loading";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { BiEdit } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 
@@ -32,13 +34,13 @@ function BackComponent() {
         { name: "0.08-0.13", code: "0.08-0.13", from: "0.0800", to: "0.1399", order: 2, status: "Active" },
     ];
 
-    const [data, setData] = useState([]);
+    // const [data, setData] = useState([]);
 
     const fetchData = async () => {
         try {
             const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
             console.log("Fetched Data:", response.data);
-            setData(response.data.data);
+            // setData(response.data.data);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
@@ -48,30 +50,22 @@ function BackComponent() {
         fetchData();
     }, []);
 
-    const storeData = async () => {
-        try {
-            const response = await axios.post("/api/users/data-modification", { tableName, data: rows, }, {
-                headers: { "Content-Type": "application/json", }, withCredentials: true,
-            });
-
-            console.log(`Data stored in ${tableName}:`, response.data.message);
-        } catch (error: any) {
-            console.error("Error storing data:", error.response?.data || error.message);
-        } finally {
-            setIsLoading(false);
-        }
+    const deleteRow = async (row: ColorRow[] | any) => {
+        const response = await axios.delete(`/api/users/data-modification?tableName=${tableName}&itemId=${row?._id}`);
+        toast.success(response?.data?.message);
+        fetchData();
     };
 
-    const actions = (row: any) => (
+    const actions = (row: ColorRow[]) => (
         <div className="flex justify-center items-center space-x-5">
             <button
-                onClick={() => console.log("Edit:", row)}
+                onClick={() => console.log(row)}
                 className="text-blue-600 hover:text-blue-900"
             >
                 <BiEdit className='w-5 h-5' />
             </button>
             <button
-                onClick={() => console.log("Delete:", row)}
+                onClick={() => deleteRow(row)}
                 className="text-red-600 hover:text-red-900"
             >
                 <MdDelete className='w-5 h-5' />
@@ -83,7 +77,7 @@ function BackComponent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={tableName} />
+                    <Modal tableName={tableName} fetchData={fetchData} headers={headers} rows={rows} />
                 </div>
 
                 {isLoading ? (
