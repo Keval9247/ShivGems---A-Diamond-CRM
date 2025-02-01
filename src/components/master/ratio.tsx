@@ -1,36 +1,67 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
-import React from 'react'
+import Loading from '@/utils/Loading';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function RatioComponent() {
 
-  const headers = ["Ratio Name", "Ratio Code", "Order", "Status"];
+    const headers = ["Ratio Name", "Ratio Code", "Order", "Status"];
+    const [isLoading, setIsLoading] = useState(true);
+    const tableName = "ratio"
 
-  const rows = [
-    { "Ratio Name": "1", "Ratio Code": "1", "Order": 1, "Status": "Active" },
-    { "Ratio Name": "225", "Ratio Code": "MQ", "Order": 18, "Status": "Active" },
-    { "Ratio Name": "210", "Ratio Code": "MQ", "Order": 17, "Status": "Active" },
-    { "Ratio Name": "195", "Ratio Code": "MQ", "Order": 16, "Status": "Active" },
-    { "Ratio Name": "180", "Ratio Code": "PNJMQ", "Order": 15, "Status": "Active" },
-    { "Ratio Name": "170", "Ratio Code": "PNJMQ", "Order": 14, "Status": "Active" },
-    { "Ratio Name": "160", "Ratio Code": "OVPNEM/RAO", "Order": 13, "Status": "Active" },
-    { "Ratio Name": "155", "Ratio Code": "OVCUGBEM/RAOPN", "Order": 12, "Status": "Active" },
-    { "Ratio Name": "150", "Ratio Code": "CUGBOVRAOEMPN,", "Order": 11, "Status": "Active" },
-    { "Ratio Name": "140", "Ratio Code": "CUGBRAOEMOV", "Order": 10, "Status": "Active" },
-    { "Ratio Name": "118", "Ratio Code": "CUGBRAOEM", "Order": 9, "Status": "Active" },
-    { "Ratio Name": "104", "Ratio Code": "PSHSCB,CURAD,SGEM", "Order": 8, "Status": "Active" },
-    { "Ratio Name": "100", "Ratio Code": "PSHSBR,CBCURAD,SGEM", "Order": 7, "Status": "Active" },
-    { "Ratio Name": "99", "Ratio Code": "HS", "Order": 6, "Status": "Active" },
-    { "Ratio Name": "93", "Ratio Code": "HS", "Order": 5, "Status": "Active" },
-    { "Ratio Name": "90", "Ratio Code": "HS", "Order": 4, "Status": "Active" },
-    { "Ratio Name": "87", "Ratio Code": "HS", "Order": 3, "Status": "Active" },
-    { "Ratio Name": "85", "Ratio Code": "HS", "Order": 2, "Status": "Active" },
-    { "Ratio Name": "81", "Ratio Code": "HS", "Order": 1, "Status": "Active" },
-  ];
+    // const rows = [
+    //     { name: "1", code: "1", order: 1, status: "Active" },
+    //     { name: "225", code: "MQ", order: 18, status: "Active" },
+    //     { name: "210", code: "MQ", order: 17, status: "Active" },
+    //     { name: "195", code: "MQ", order: 16, status: "Active" },
+    //     { name: "180", code: "PNJMQ", order: 15, status: "Active" },
+    //     { name: "170", code: "PNJMQ", order: 14, status: "Active" },
+    //     { name: "160", code: "OVPNEM/RAO", order: 13, status: "Active" },
+    //     { name: "155", code: "OVCUGBEM/RAOPN", order: 12, status: "Active" },
+    //     { name: "150", code: "CUGBOVRAOEMPN,", order: 11, status: "Active" },
+    //     { name: "140", code: "CUGBRAOEMOV", order: 10, status: "Active" },
+    //     { name: "118", code: "CUGBRAOEM", order: 9, status: "Active" },
+    //     { name: "104", code: "PSHSCB,CURAD,SGEM", order: 8, status: "Active" },
+    //     { name: "100", code: "PSHSBR,CBCURAD,SGEM", order: 7, status: "Active" },
+    //     { name: "99", code: "HS", order: 6, status: "Active" },
+    //     { name: "93", code: "HS", order: 5, status: "Active" },
+    //     { name: "90", code: "HS", order: 4, status: "Active" },
+    //     { name: "87", code: "HS", order: 3, status: "Active" },
+    //     { name: "85", code: "HS", order: 2, status: "Active" },
+    //     { name: "81", code: "HS", order: 1, status: "Active" },
+    // ];
 
-  const field = "ratio"
+    const [rows, setRows] = useState<ColorRow[]>([]);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+            const apiData = response.data.data;
+
+            if (apiData.length > 0) {
+                const mappedData = apiData.map((item: any) => ({
+                    "Ratio Name": item.name,
+                    "Ratio Code": item.code,
+                    "Order": item.order,
+                    "Status": item.status,
+                }));
+
+                setRows(mappedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const actions = (row: any) => (
         <div className="flex justify-center items-center space-x-5">
@@ -53,14 +84,14 @@ function RatioComponent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={field} />
+                    <Modal tableName={tableName} fetchData={fetchData} />
                 </div>
 
-                <CustomTable
-                    headers={headers}
-                    rows={rows}
-                    actions={actions}
-                />
+                {isLoading ? (
+                    <Loading global={true} isLoading={isLoading} />
+                ) : (
+                    <CustomTable headers={headers} rows={rows} actions={actions} />
+                )}
             </div>
         </>
     );

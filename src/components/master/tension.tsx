@@ -1,21 +1,53 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
-import React from 'react'
+import Loading from '@/utils/Loading';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function TensionCompoenent() {
 
     const headers = ["Tension Name", "Tension Code", "Order", "Status"];
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const tableName = "tension";
 
-    const rows = [
-        { "Tension Name": "5", "Tension Code": "5", "Order": 6, "Status": "Active" },
-        { "Tension Name": "4", "Tension Code": "4", "Order": 5, "Status": "Active" },
-        { "Tension Name": "2", "Tension Code": "2", "Order": 3, "Status": "Active" },
-        { "Tension Name": "1", "Tension Code": "1", "Order": 2, "Status": "Active" },
-        { "Tension Name": "0", "Tension Code": "0", "Order": 1, "Status": "Active" },
-    ];
-    const field = "tension"
+    // const rows = [
+    //     { name: "5", code: "5", order: 6, status: "Active" },
+    //     { name: "4", code: "4", order: 5, status: "Active" },
+    //     { name: "2", code: "2", order: 3, status: "Active" },
+    //     { name: "1", code: "1", order: 2, status: "Active" },
+    //     { name: "0", code: "0", order: 1, status: "Active" },
+    // ];
+
+    const [rows, setRows] = useState<ColorRow[]>([]);
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+            const apiData = response.data.data;
+
+            if (apiData.length > 0) {
+                const mappedData = apiData.map((item: any) => ({
+                    "Tension Name": item.name,
+                    "Tension Code": item.code,
+                    "Order": item.order,
+                    "Status": item.status,
+                }));
+
+                setRows(mappedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const actions = (row: any) => (
         <div className="flex justify-center items-center space-x-5">
@@ -38,14 +70,14 @@ function TensionCompoenent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={field} />
+                    <Modal tableName={tableName} fetchData={fetchData} />
                 </div>
 
-                <CustomTable
-                    headers={headers}
-                    rows={rows}
-                    actions={actions}
-                />
+                {isLoading ? (
+                    <Loading global={true} isLoading={isLoading} />
+                ) : (
+                    <CustomTable headers={headers} rows={rows} actions={actions} />
+                )}
             </div>
         </>
     );

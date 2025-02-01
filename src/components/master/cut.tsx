@@ -1,36 +1,80 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
-import React from 'react'
+import Loading from '@/utils/Loading';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function CutCompoenent() {
     const headers = ["Cut Name", "Cut Code", "Order", "Status"];
+    const [isLoading, setIsLoading] = useState(true);
+    const tableName = "cut";
 
-    const rows = [
-        { "Cut Name": "K HA", "Cut Code": "K HA", "Order": 9, "Status": "Active" },
-        { "Cut Name": "8X", "Cut Code": "8X", "Order": 8, "Status": "Active" },
-        { "Cut Name": "HA", "Cut Code": "HA", "Order": 7, "Status": "Active" },
-        { "Cut Name": "LG", "Cut Code": "LG", "Order": 6, "Status": "Active" },
-        { "Cut Name": "FR", "Cut Code": "FR", "Order": 5, "Status": "Active" },
-        { "Cut Name": "GD", "Cut Code": "GD", "Order": 4, "Status": "Active" },
-        { "Cut Name": "VG", "Cut Code": "VG", "Order": 3, "Status": "Active" },
-        { "Cut Name": "EX", "Cut Code": "EX", "Order": 2, "Status": "Active" },
-        { "Cut Name": "ID", "Cut Code": "ID", "Order": 1, "Status": "Active" },
-    ];
+    // const rows = [
+    //     { name: "K HA", code: "K HA", order: 9, status: "Active" },
+    //     { name: "8X", code: "8X", order: 8, status: "Active" },
+    //     { name: "HA", code: "HA", order: 7, status: "Active" },
+    //     { name: "LG", code: "LG", order: 6, status: "Active" },
+    //     { name: "FR", code: "FR", order: 5, status: "Active" },
+    //     { name: "GD", code: "GD", order: 4, status: "Active" },
+    //     { name: "VG", code: "VG", order: 3, status: "Active" },
+    //     { name: "EX", code: "EX", order: 2, status: "Active" },
+    //     { name: "ID", code: "ID", order: 1, status: "Active" },
+    // ];
 
-    const field = "cut"
+    const [rows, setRows] = useState<ColorRow[]>([]);
 
-    const actions = (row: any) => (
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+            const apiData = response.data.data;
+
+            if (apiData.length > 0) {
+                const mappedData = apiData.map((item: any) => ({
+                    _id: item._id,
+                    "Cut Name": item.name,
+                    "Cut Code": item.code,
+                    "Order": item.order,
+                    "Status": item.status,
+                }));
+
+                setRows(mappedData);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    // const editRow = async (row: ColorRow[]) => {
+    //     const response = await axios.put(`/api/users/data-modification?tableName=${tableName}`,{tableName,ro});
+    // };
+
+    const deleteRow = async (row: ColorRow[] | any) => {
+        const response = await axios.delete(`/api/users/data-modification?tableName=${tableName}&itemId=${row?._id}`);
+        console.log("🚀🚀 Your selected text is => response: ", response);
+        toast.success(response?.data?.message);
+        fetchData();
+    };
+
+    const actions = (row: ColorRow[]) => (
         <div className="flex justify-center items-center space-x-5">
             <button
-                onClick={() => console.log("Edit:", row)}
+                onClick={() => console.log(row)}
                 className="text-blue-600 hover:text-blue-900"
             >
                 <BiEdit className='w-5 h-5' />
             </button>
             <button
-                onClick={() => console.log("Delete:", row)}
+                onClick={() => deleteRow(row)}
                 className="text-red-600 hover:text-red-900"
             >
                 <MdDelete className='w-5 h-5' />
@@ -42,14 +86,14 @@ function CutCompoenent() {
         <>
             <div className="w-full">
                 <div className='flex justify-end mb-3'>
-                    <Modal field={field} />
+                    <Modal tableName={tableName} fetchData={fetchData} />
                 </div>
 
-                <CustomTable
-                    headers={headers}
-                    rows={rows}
-                    actions={actions}
-                />
+                {isLoading ? (
+                    <Loading global={true} isLoading={isLoading} />
+                ) : (
+                    <CustomTable headers={headers} rows={rows} actions={actions} />
+                )}
             </div>
         </>
     );

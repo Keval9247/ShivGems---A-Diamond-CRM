@@ -1,20 +1,53 @@
+import { ColorRow } from '@/types/rowTypes';
 import Modal from '@/utils/common-modal/modal';
 import CustomTable from '@/utils/CustomTable';
-import React from 'react'
+import Loading from '@/utils/Loading';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { BiEdit } from 'react-icons/bi';
 import { MdDelete } from 'react-icons/md';
 
 function SymmetryComponent() {
-  const headers = ["Symmetry Name", "Symmetry Code", "Order", "Status"];
 
-  const rows = [
-    { "Symmetry Name": "FR", "Symmetry Code": "FR", "Order": 5, "Status": "Active" },
-    { "Symmetry Name": "GD", "Symmetry Code": "GD", "Order": 4, "Status": "Active" },
-    { "Symmetry Name": "VG", "Symmetry Code": "VG", "Order": 3, "Status": "Active" },
-    { "Symmetry Name": "EX", "Symmetry Code": "EX", "Order": 2, "Status": "Active" },
-    { "Symmetry Name": "ID", "Symmetry Code": "ID", "Order": 1, "Status": "Active" },
-  ];
-  const field = "symmetry"
+  const headers = ["Symmetry Name", "Symmetry Code", "Order", "Status"];
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const tableName = "symmetry";
+
+  // const rows = [
+  //   { name: "FR", code: "FR", order: 5, status: "Active" },
+  //   { name: "GD", code: "GD", order: 4, status: "Active" },
+  //   { name: "VG", code: "VG", order: 3, status: "Active" },
+  //   { name: "EX", code: "EX", order: 2, status: "Active" },
+  //   { name: "ID", code: "ID", order: 1, status: "Active" },
+  // ];
+
+  const [rows, setRows] = useState<ColorRow[]>([]);
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`/api/users/data-modification?tableName=${tableName}`);
+      const apiData = response.data.data;
+
+      if (apiData.length > 0) {
+        const mappedData = apiData.map((item: any) => ({
+          "Symmetry Name": item.name,
+          "Symmetry Code": item.code,
+          "Order": item.order,
+          "Status": item.status,
+        }));
+
+        setRows(mappedData);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const actions = (row: any) => (
     <div className="flex justify-center items-center space-x-5">
@@ -37,14 +70,15 @@ function SymmetryComponent() {
     <>
       <div className="w-full">
         <div className='flex justify-end mb-3'>
-          <Modal field={field} />
+          <Modal tableName={tableName} fetchData={fetchData} />
         </div>
 
-        <CustomTable
-          headers={headers}
-          rows={rows}
-          actions={actions}
-        />
+
+        {isLoading ? (
+          <Loading global={true} isLoading={isLoading} />
+        ) : (
+          <CustomTable headers={headers} rows={rows} actions={actions} />
+        )}
       </div>
     </>
   );
